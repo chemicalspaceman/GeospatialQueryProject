@@ -1,5 +1,5 @@
 //Define a bunch of global variable for dataframe set up
-var plotDist;
+//var plotDist;
 var noRows;
 var noCols;
 var dataRows;
@@ -17,6 +17,8 @@ var windSpeedPos;
 var waveHeightPos;
 var averagePerPos
 var airTempPos;
+var distancePos;
+var timePos;
 var withinHours = 3; //How recent you would like the data to be (Hours)
 var withinMiles = 100; //How far away would you like to see data from (miles)
 var result = new Array();
@@ -26,12 +28,12 @@ var dataFrame = new Array();
 var latLong = new Array();
 latLong[0] = 50.2839 // MSW Latitude
 latLong[1] = -3.7775 // MSW Longitude
-var mymap = L.map('mapid').setView([latLong[0], latLong[1]], 8);
+var mymap = L.map('mapid').setView([latLong[0], latLong[1]], 7.5);
 var marker = {};
 var circle = {};
-var mInMile = 1609.34;
+var mInMile = 1609.344;
 
-//Map click event
+//Register map click event
 mymap.on('click', onMapClick);
 
 //Initialize map drawing
@@ -39,8 +41,10 @@ drawMap();
 
 	
 function drawMap(){
-
-	mymap.closePopup();
+	//close previous popups
+	mymap.closePopup(popup);
+	
+	//Use fly animation to new latlng
 	mymap.flyTo([latLong[0], latLong[1]]);
 
 	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -50,37 +54,43 @@ function drawMap(){
 		accessToken: 'pk.eyJ1IjoiY2hlbWljYWxzcGFjZW1hbiIsImEiOiJjanJna2U3NnIxNjBkNDRvZ2ZlaHFxdHh1In0.opUnKNO3WAOLCcspchY0Zg'
 	}).addTo(mymap);
 
-		
+	//Remove any previous location marker	
 	if(marker != undefined){
 		mymap.removeLayer(marker);
 	}
 
+	//Draw new marker
 	marker = L.marker([latLong[0], latLong[1]]).addTo(mymap);
-	marker.bindPopup("<b>This is you!</b><br>Right here.").openPopup();
+	marker.bindPopup("<b>Your chosen location!</b>").openPopup();
 
+	//Remove any previous location circle
 	if(circle != undefined){
 		mymap.removeLayer(circle);
 	}
-		
+
+	//Draw new circle
 	circle = L.circle([latLong[0], latLong[1]], {
     color: 'rgba(250,42,0,0.6)',
     fillColor: '#F3DAD5',
     fillOpacity: 0.3,
-    radius: withinMiles*mInMile
+    radius: (20+withinMiles)*mInMile //Added 20 miles, is a bit cheeky but circle so large curve of earth sometimes effecting containment
 	}).addTo(mymap);
 
+	//Draw popups for all stations within range
 	for(var i = 0; i<dataFrame.length;i++){
 		if(i==0){
 			var popup = L.popup()
 				.setLatLng([dataFrame[i][latPos], dataFrame[i][lonPos]])
-				.setContent("<dl><dt>Station:</dt>" + "<dd>" + dataFrame[i][stationPos] + "</dd>" + "<dt>Distance:</dt>" + "<dd>" + plotDist + " Miles" + "</dd>")
+				.setContent("<dl><dt>Station:</dt>" + "<dd>" + dataFrame[i][stationPos] + "</dd></d1>")
 				.openOn(mymap);
 		}
 		else{
 			var popup = L.popup()
 				.setLatLng([dataFrame[i][latPos], dataFrame[i][lonPos]])
-				.setContent("<dl><dt>Station:</dt>" + "<dd>" + dataFrame[i][stationPos] + "</dd>" + "<dt>Distance:</dt>" + "<dd>" + plotDist + " Miles" + "</dd>")
+				.setContent("<dl><dt>Station:</dt>" + "<dd>" + dataFrame[i][stationPos] + "</dd></d1>")
 				.addTo(mymap);
+
+			//Can add distance inside popup using "<dt>Distance:</dt>" + "<dd>" + dataFrame[i][distancePos] + " Miles" (looks neater without)
 		}
 	}
 }
@@ -89,6 +99,13 @@ function drawMap(){
 //Alert user of latitude and longitude on map click
 function onMapClick(e) {
 	swal("You clicked the map at:", " " + e.latlng, "info");
+
+	//Take user click info and find relevant observations
+	latLong[0] = e.latlng.lat;
+	latLong[1] = e.latlng.lng;
+
+	createDataframe();
+ 	drawMap();
 }
 
 	
@@ -103,7 +120,7 @@ fetch('https://cors-anywhere.herokuapp.com/http://www.ndbc.noaa.gov/data/latest_
 //Alert user once the latest data has been imported and preprocess import
 function process_response(text){
 	swal("All done!", "The latest NDBC data has been successfully loaded","success",{button:"Let's go",
-		});
+	});
 
 	//Removes all 'next line' commands from text
 	text = text.replace(/(\r\n|\n|\r)/gm," ")
@@ -129,8 +146,6 @@ function stringSplit(str){
 			j++
 		}		
 	}
-
-	result[0][noCols-1] = "DST";
 	createDataframe();
 }
 
@@ -144,7 +159,7 @@ function createDataframe(){
 	lonPos = result.indexOf("LON");
 	yearPos = result.indexOf("YYYY");
 	monthPos = yearPos + 1;
-	 dayPos = result.indexOf("DD");
+	dayPos = result.indexOf("DD");
 	hourPos = result.indexOf("hh");
 	minutePos = result.indexOf("mm");
 	windDirPos = result.indexOf("WDIR");
@@ -153,8 +168,8 @@ function createDataframe(){
 	averagePerPos = result.indexOf("APD");
 	airTempPos = result.indexOf("ATMP");
 	waterTempPos = result.indexOf("WTMP");
-	distancePos = result.indexOf("DST");
-
+	timePos = result.indexOf("VIS"); //Going to overwrite the VIS column
+	distancePos = result.indexOf("TIDE"); //Going to overwrite the TIDE column
 		
 	//Removes first 2 rows (Headings and units) and separates each station
 	var j = 0;
@@ -180,8 +195,10 @@ function createDataframe(){
 			
 		var distDiff = geospatialQuery(latLong[0],latLong[1],loopLat,loopLon,"M");
 
-		//Overwriting the unused "TIDE" column to keep distances from marker
+
+		//Overwriting the unused "TIDE" and "VIS" columns to keep distances and times
 		dataFrame[i][distancePos] = distDiff;
+		dataFrame[i][timePos] = checkDate.toLocaleString();
 
 		//Remove rows
 		if(timeDiff>(1000*60*60*withinHours)){
@@ -193,7 +210,7 @@ function createDataframe(){
 			dataFrame.splice(i,1);
 		}
 	}
-		//Adjust number of rows occordingly
+	//Adjust number of rows occordingly
 	noRows = dataFrame.length;
 		
 	buildTable();	
@@ -205,17 +222,22 @@ function geospatialQuery(lat1, lon1, lat2, lon2, unit) {
 		return 0;
 	}
 	else {
+		//Turn degrees to radians
 		var radlat1 = Math.PI * lat1/180;
 		var radlat2 = Math.PI * lat2/180;
+
+		//Find difference and direction
 		var theta = lon1-lon2;
 		var radtheta = Math.PI * theta/180;
+
+		//Variation of the Haversine formula to calculate as crow flies globe distances using (re)versed sine
 		var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-		
 		if (dist > 1) {
 			dist = 1;
 		}
-
 		dist = Math.acos(dist);
+
+		//Turn distance into miles
 		dist = dist * 180/Math.PI;
 		dist = dist * 60 * 1.1515;
 
@@ -228,6 +250,8 @@ function geospatialQuery(lat1, lon1, lat2, lon2, unit) {
 
 
 function submitter() {
+
+	//On button click take value and find observations from form input
  	latLong[0] = document.getElementById("lat").value;
  	latLong[1] = document.getElementById("lon").value;
 
@@ -239,13 +263,15 @@ function submitter() {
 function buildTable() {
   	var table = document.getElementById("dataTable");
 
-  	for(var i = 0; i<table.rows.length; i++){
-  		if(i < table.rows.length){
+  	//Delete current table
+  	var currentRows = table.rows.length;
+  	for(var i = currentRows-1; i>=0; i--){
+  		//if(i < table.rows.length){
   			table.deleteRow(i);
-  		}
+  		//}
   	}
 
-
+  	//Rebuild table
   	for(var i = 0; i<dataFrame.length; i++){
   		var row = table.insertRow(i);
   		var stationValue = row.insertCell(0);
@@ -258,6 +284,7 @@ function buildTable() {
   		var airTempValue = row.insertCell(7);
   		var waterTempValue = row.insertCell(8);
   		var distanceValue = row.insertCell(9);
+  		var timeValue = row.insertCell(10);
 
   		stationValue.innerHTML = dataFrame[i][stationPos];
   		latitudeValue.innerHTML = dataFrame[i][latPos];
@@ -268,9 +295,42 @@ function buildTable() {
   		averagePerValue.innerHTML = dataFrame[i][averagePerPos];
   		airTempValue.innerHTML = dataFrame[i][airTempPos];
   		waterTempValue.innerHTML = dataFrame[i][waterTempPos];
-
-  		var d1 = parseInt(dataFrame[i][distancePos]);
-  		plotDist = Math.round(d1);
-  		distanceValue.innerHTML = plotDist;
-	}
+  		distanceValue.innerHTML = dataFrame[i][distancePos].toFixed(2);
+  		timeValue.innerHTML = dataFrame[i][timePos];
+	}	
 }
+
+//Handle geolocation
+let latText = document.getElementById("latitude");
+let longText = document.getElementById("longitude");
+
+//On "Get My Location" button click
+function getLocation(){
+	//Get location if possible and showPosition()
+	if (navigator.geolocation) {
+    	navigator.geolocation.getCurrentPosition(showPosition);
+  	} 
+  	else{
+  		//Display an error if not supported
+    	swal("Geolocation is not supported by this browser.","Sorry","error");
+  	}
+}
+
+
+function showPosition(position){
+    let lat = position.coords.latitude;
+    let long = position.coords.longitude;
+
+    //2 decimal places to display above button
+    latText.innerText = lat.toFixed(2);
+    longText.innerText = long.toFixed(2);
+
+    //Find observations near location
+    latLong[0] = lat;
+ 	latLong[1] = long;
+
+ 	createDataframe();
+ 	drawMap();
+}
+
+console.log("Weather and wave data visualiser - Matthew Bailey")
