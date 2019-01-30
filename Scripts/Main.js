@@ -79,13 +79,17 @@ function drawMap(){
 	//Draw popups for all stations within range
 	for(var i = 0; i<dataFrame.length;i++){
 		if(i==0){
-			var popup = L.popup()
+			var popup = L.popup({
+				maxWidth: 60,
+				maxHeight: 50})
 				.setLatLng([dataFrame[i][latPos], dataFrame[i][lonPos]])
 				.setContent("<dl><dt>Station:</dt>" + "<dd>" + dataFrame[i][stationPos] + "</dd></d1>")
 				.openOn(mymap);
 		}
 		else{
-			var popup = L.popup()
+			var popup = L.popup({
+				maxWidth: 60,
+				maxHeight: 50})
 				.setLatLng([dataFrame[i][latPos], dataFrame[i][lonPos]])
 				.setContent("<dl><dt>Station:</dt>" + "<dd>" + dataFrame[i][stationPos] + "</dd></d1>")
 				.addTo(mymap);
@@ -98,11 +102,19 @@ function drawMap(){
 
 //Alert user of latitude and longitude on map click
 function onMapClick(e) {
-	swal("You clicked the map at:", " " + e.latlng, "info");
+	//swal("You clicked the map at:", " " + e.latlng, "info");
 
 	//Take user click info and find relevant observations
 	latLong[0] = e.latlng.lat;
 	latLong[1] = e.latlng.lng;
+
+	//Write latlng in 'your location' section
+	let lat = latLong[0];
+    let long = latLong[1];
+
+    //2 decimal places to display above button
+    latText.innerText = lat.toFixed(2);
+    longText.innerText = long.toFixed(2);
 
 	createDataframe();
  	drawMap();
@@ -255,8 +267,13 @@ function submitter() {
  	latLong[0] = document.getElementById("lat").value;
  	latLong[1] = document.getElementById("lon").value;
 
- 	createDataframe();
- 	drawMap();
+ 	if(latLong[0]< -90 || latLong[0] > 90 || latLong[1]< -180 || latLong[1] > 180){
+ 		swal("Input not in range","-90 < Latitude < 90 AND -180 < Longitude < 180", "error",{button:"My bad",})
+ 	}
+ 	else{
+ 		createDataframe();
+ 		drawMap();
+ 	}
 }
 
 

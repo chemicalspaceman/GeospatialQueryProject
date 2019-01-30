@@ -51,12 +51,18 @@
 
             <h5> There are 3 ways to find the data you need: </h5>
 
-      			<p><i class="fa fa-map-marker w3-text-teal w3-large"></i> Click on the map to get data at that location.</p>
+      			<p>
+              <ol>
+                <li><b>Click on the map</b> to get data at that location. The latitude and longitude will be appear as 'your location'. </li><br>
 
-      	    <p><i class="fa fa-map-marker w3-text-teal w3-large"></i> Enter a latitude and longitude into the form and click "Submit"!</p>
+                <li>Enter a latitude and longitude into the form and click "<b>Submit</b>"! </li><br>
 
-            <p><i class="fa fa-map-marker w3-text-teal w3-large"></i> Use geo location to determine your current position and get data near you by clicking "Get My Location"!</p>
-            
+                <li>Use geo location to determine your current position and get data near you by clicking "<b>Get My Location</b>"! </li><br>
+
+              </ol>
+            </p>
+
+      	  
     			</div>
 
     			<div class="w3-padding w3-col m5">
@@ -79,11 +85,11 @@
 		</div>
 
     <div class="w3-container w3-padding-16 w3-theme-l5">
-            <p ALIGN = "CENTER">
-            Your location is <b><span id="latitude">0.00</span></b>°
-            latitude by <b><span id="longitude">0.00</span></b>° longitude.
 
-            
+            <h4 align = "center"><b>Your location is:</b></h4>
+            <p ALIGN = "CENTER">
+              <b><span id="latitude">0.00</span></b>&deg;
+              latitude by <b><span id="longitude">0.00</span></b>&deg; longitude.
             </p>
             <p ALIGN = "center">
             <button onclick="getLocation()" class="w3-button w3-center w3-theme">
@@ -109,8 +115,8 @@
         					<th>WIND SPEED 		<br/> (m/s) 	</th>
         					<th>WAVE HEIGHT 	<br/> (m)		</th>
         					<th>AVG PERIOD 		<br/> (sec)		</th>
-        					<th>AIR TEMP 		<br/> (°C) 		</th>
-        					<th>WATER TEMP 		<br/> (°C)		</th>
+        					<th>AIR TEMP 		<br/> (&#8451;) 		</th>
+        					<th>WATER TEMP 		<br/> (&#8451;)		</th>
         					<th>DISTANCE 		<br/> (miles)	</th>
                   <th>LAST UPDATED   <br/> (UTC/GMT) </th>
         				</tr>
