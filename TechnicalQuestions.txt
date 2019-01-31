@@ -1,0 +1,120 @@
+//////REQUIREMENTS//////
+
+USER STORY: The user can see the status of the import, get a list of observations, use geolocation to determine current location + instantly see results near them.
+
+COMPILE: Code runs on page load
+
+FRAMEWORK/ LIBRARIES/ PACKAGES: Leaflet.js, w3.css, sweetalert.min.js
+
+SOME TEST CASES: 
+
+	Click Submit on page load for Kingsbridge coordinates to run.
+
+	Click Get My Location and then click allow to use geo location
+
+	Click anywhere on map to check those coordinates
+
+	Near New York 
+	40.277° latitude by -73.037° longitude.
+
+	Near Seattle/ Olympia
+	47.120° latitude by -122.932° longitude.
+
+	Honolulu, Hawaii
+	21.588° latitude by -158.036° longitude.
+
+API KEYS: Leaflet.js offers a default public token with an account here https://account.mapbox.com/access-tokens/
+
+	Token: pk.eyJ1IjoiY2hlbWljYWxzcGFjZW1hbiIsImEiOiJjanJna2U3NnIxNjBkNDRvZ2ZlaHFxdHh1In0.opUnKNO3WAOLCcspchY0Zg
+
+
+
+//////CRITERIA//////
+
+On page load the web app attempts to load from latest observations: https://www.ndbc.noaa.gov/data/latest_obs/latest_obs.txt
+
+Only results within the last 3 hours are shown
+
+Station identifier, a variety of observations and the observation are displayed in UTC/GMT
+
+Table headings have human readable labels with unit abbreviations
+
+
+
+//////TECHNICAL QUESTIONS/////
+
+1. How long did you spend completing the assignment? How (if at all) would you change
+your solution if you had more time?
+
+I spent somewhere between 15-20 hours on the geospatial query project. My main aim was to ensure that the web interface was user friendly, intuitive and felt smooth to use. I think from a 'user story' standpoint I am happy with it. Mainly using skills that I already possessed, I built a dataframe (basically just a bunch of nested arrays) using JS and created a geospatial query function that passes the latitude and longitude of two global positions and returns the distance between them. Whilst this is a suitable method I am aware that using a database language such as SQL would be more efficient, allow storage of larger data sets and perform a broader range of in-built queries. Long story short, I'd like to add more functionality such as: 
+
+Being able to order the observation table by distance, wave height, temperature etc.
+
+Store previous data points so that comparisons could be made between current and previous conditions. I contemplated adding a graph feature where you could have a visual comparison between the stations however, it would just be nicer to see how an observation, such as wave height, varies over time at a specific station/ buoy. 
+
+
+////////////////////////////////////////////////////////
+
+2. Can you describe a feature (perhaps with some reference code) that exists in your
+chosen programming language that you found particularly useful?
+
+Sometimes it's the simple functions that are the most useful, here I used .splice(); to really cut down computation time by removing the unimportant bits of data. Each time a new latLng submission is made, all observations older than 3 hours and further than 100 miles away are just removed from the dataframe. This means that filling the table and creating map pop ups is super-efficient compared to looping over the whole dataframe.
+
+Example:
+		if(timeDiff>(1000*60*60*withinHours)){
+			//Remove row if data older than 3 hours
+			dataFrame.splice(i,1);
+		}
+		else if(distDiff>100){
+			//Remove row if not within 100 miles
+			dataFrame.splice(i,1);
+		}
+
+As well as this, being able to 'hard code' the geospatial query using the JS Math objects really made the project possible. By adapting the Haversine formula for global distances, the Math objects were sufficient to calculate the distance between two global positions, which I thought was pretty cool. 
+
+Example:
+		function geospatialQuery(lat1, lon1, lat2, lon2) {
+			if ((lat1 == lat2) && (lon1 == lon2)) {
+				return 0;
+			}
+			else {
+				//Turn degrees to radians
+				var radlat1 = Math.PI * lat1/180;
+				var radlat2 = Math.PI * lat2/180;
+
+				//Find difference and direction
+				var theta = lon1-lon2;
+				var radtheta = Math.PI * theta/180;
+
+				//Variation of the Haversine formula to calculate as crow flies globe distances 				using (re)versed sine
+				var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos					(radlat2) * Math.cos(radtheta);
+				if (dist > 1) {
+					dist = 1;
+				}
+				dist = Math.acos(dist);
+
+				//Turn distance into miles
+				dist = dist * 180/Math.PI;
+				dist = dist * 60 * 1.1515;
+
+				return dist;
+			}
+		}
+
+////////////////////////////////////////////////////////
+
+3. How would you track down a performance issue with yours or another developer's code?
+
+Whilst writing this code I regularly used console.log() as the first level of detection of any issues. Whether checking the speed of a loop or how quickly an event happens when triggered console.log() usually gives a good visual indication of any bugs and speed issues. 
+
+Secondly, for javascript, I may run a linter to quickly check for any issues with the code. This can be good practice as it helps spot any minor errors that regularly crop up in your code, and help you delve into why they're inefficient. 
+
+Finally, I personally use chrome as my default browser and google have some great performance analysis dev tools built-in. Using the Chrome DevTools in browser you can record performance as you actively use the page and then analyse the data, alongside screenshots of the events that may have caused any issues. Statistics on FPS and processing time for each triggered element of your code are listed so you can track down any areas which may be causing a problem. 
+
+I sometimes use www.jslint.com just to improve coding technique and for this project used Chrome DevTools  console and performance analysis tools to track down some FPS drops I was getting on map clicks in areas with a large number of nearby stations. The issue was caused by two things: I didn't have .splice() set up to remove all unwanted data; and the order in which the leaflet.js maps' flyTo function and the dataframe were being created. Whilst I have improved on this issue you can still see a slight FPS drop in the attached image Performance_check.jpg however, with almost all functions in the JS code being run on a map click I feel it is running pretty smoothly. 
+
+
+////////////////////////////////////////////////////////
+
+
+Overall, thanks for setting such a well thought out project. I felt it gave me a great indication of the kind of challenges that developers at MSW face. I enjoyed working on it and hope you like it too. I'd love to hear any feedback you have. 

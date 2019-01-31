@@ -2,7 +2,7 @@
 var noRows;
 var noCols;
 var dataRows;
-var dataCols; 
+var dataCols;
 var stationPos;
 var latPos;
 var lonPos;
@@ -14,7 +14,7 @@ var minutePos;
 var windDirPos;
 var windSpeedPos;
 var waveHeightPos;
-var averagePerPos
+var averagePerPos;
 var airTempPos;
 var distancePos;
 var timePos;
@@ -25,8 +25,8 @@ var dataFrame = new Array();
 
 //Submission form and map variables
 var latLong = new Array();
-latLong[0] = 50.2839 // MSW Latitude
-latLong[1] = -3.7775 // MSW Longitude
+latLong[0] = 50.2839; // MSW Latitude
+latLong[1] = -3.7775; // MSW Longitude
 var mymap = L.map('mapid').setView([latLong[0], latLong[1]], 7.5);
 var marker = {};
 var circle = {};
@@ -38,11 +38,10 @@ mymap.on('click', onMapClick);
 //Initialize map drawing
 drawMap();
 
-	
 function drawMap(){
 	//close previous popups
 	mymap.closePopup(popup);
-	
+
 	//Use fly animation to new latlng
 	mymap.flyTo([latLong[0], latLong[1]]);
 
@@ -69,8 +68,8 @@ function drawMap(){
 
 	//Draw new circle
 	circle = L.circle([latLong[0], latLong[1]], {
-    color: 'rgba(250,42,0,0.6)',
-    fillColor: '#F3DAD5',
+    color: "rgba(250,42,0,0.6",
+    fillColor: "#F3DAD5",
     fillOpacity: 0.3,
     radius: (20+withinMiles)*mInMile //Added 20 miles, is a bit cheeky but circle so large curve of earth sometimes effecting containment
 	}).addTo(mymap);
@@ -105,7 +104,9 @@ function onMapClick(e) {
 
 	//Take user click info and find relevant observations
 	latLong[0] = e.latlng.lat;
-	latLong[1] = e.latlng.lng;
+	//Account for wild map clicks and take back to 'original' map
+	latLong[1] = e.latlng.lng % 180; //JS modulo doesn't recognise sign (dumb but useful here)
+
 
 	//Write latlng in 'your location' section
 	let lat = latLong[0];
@@ -204,7 +205,7 @@ function createDataframe(){
 		var loopLat = parseInt(dataFrame[i][latPos]);
 		var loopLon = parseInt(dataFrame[i][lonPos]);
 			
-		var distDiff = geospatialQuery(latLong[0],latLong[1],loopLat,loopLon,"M");
+		var distDiff = geospatialQuery(latLong[0],latLong[1],loopLat,loopLon);
 
 
 		//Overwriting the unused "TIDE" and "VIS" columns to keep distances and times
@@ -213,7 +214,7 @@ function createDataframe(){
 
 		//Remove rows
 		if(timeDiff>(1000*60*60*withinHours)){
-			//Remove row if data ikdr than 3 hours
+			//Remove row if data older than 3 hours
 			dataFrame.splice(i,1);
 		}
 		else if(distDiff>100){
@@ -228,7 +229,7 @@ function createDataframe(){
 }
 
 
-function geospatialQuery(lat1, lon1, lat2, lon2, unit) {
+function geospatialQuery(lat1, lon1, lat2, lon2) {
 	if ((lat1 == lat2) && (lon1 == lon2)) {
 		return 0;
 	}
@@ -252,9 +253,6 @@ function geospatialQuery(lat1, lon1, lat2, lon2, unit) {
 		dist = dist * 180/Math.PI;
 		dist = dist * 60 * 1.1515;
 
-		//Functionality to check Kilometers or Nautical miles
-		if (unit=="K"){dist = dist * 1.609344 }
-		if (unit=="N"){dist = dist * 0.8684 }
 		return dist;
 	}
 }
