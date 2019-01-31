@@ -1,6 +1,6 @@
 # Weather and Wave Data Visualiser
 
-WWDV allows a user to find information about weather and wave conditions, using data from the national data buoy center (NDBC).
+WWDV allows a user to find information about weather and wave conditions, using the latest data from the national data buoy center (NDBC).
 
 ## Installation
 
