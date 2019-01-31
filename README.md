@@ -4,7 +4,7 @@ WWDV allows a user to find information about weather and wave conditions, using 
 
 ## Installation
 
-Directly from the GeospatialQueryProject repository. 
+Directly from the GeospatialQueryProject repository:
 
 ```bash
 Download repository as a .zip file 
