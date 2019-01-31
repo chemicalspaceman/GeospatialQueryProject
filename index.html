@@ -2,22 +2,25 @@
 	<head>
 		<title>WWDV</title>
 
-		<!-- For map -->
-		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
-   		integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
-   		crossorigin=""/>
 
-   	<!-- Table and anything else -->
+
+   	<!-- Table and some other bits -->
    	<link rel="stylesheet" href="css/style.css">
 
    	<!-- Form layout -->
 		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 		<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+
 		<!--Stylesheet containing the little location markers for form section -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <!-- Wave favicon from https://www.favicon.cc/?action=icon&file_id=193906-->
     <link href="favicon.ico" rel="icon" type="image/x-icon" />
+
+    <!-- For map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+      integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+      crossorigin=""/>
 
 
    		<style>
@@ -46,18 +49,18 @@
 
       			<h3>How does it work?</h3>
             <p>
-            First you will be notified that the import of the latest NDBC data has been successfully loaded (usually as soon as you load the page). Then you can use any of the following methods to get a list of observations in a 100 mile radius of your chosen location.
+            First, you will be notified that the import of the latest NDBC data has been successfully loaded (usually as soon as the page is loaded). Then, you can use any of the following methods to get a list of observations in a 100 mile radius of your chosen location. All results are displayed in the table at the bottom of the page.
             </p>
 
             <h5> There are 3 ways to find the data you need: </h5>
 
       			<p>
               <ol>
-                <li><b>Click on the map</b> to get data at that location. The latitude and longitude will be appear as 'your location'. </li><br>
+                <li><b>Click on the map</b> to get data at that location. The latitude and longitude will be appear as the 'current location'. </li><br>
 
-                <li>Enter a latitude and longitude into the form and click "<b>Submit</b>"! </li><br>
+                <li>Enter a latitude and longitude into the form and click "<b>Submit</b>". </li><br>
 
-                <li>Use geo location to determine your current position and get data near you by clicking "<b>Get My Location</b>"! </li><br>
+                <li>Use geo location to determine your current position and get data near you by clicking "<b>Get My Location</b>". </li><br>
 
               </ol>
             </p>
@@ -86,10 +89,10 @@
 
     <div class="w3-container w3-padding-16 w3-theme-l5">
 
-            <h4 align = "center"><b>Your location is:</b></h4>
+            <h4 align = "center"><b>The current location is:</b></h4>
             <p ALIGN = "CENTER">
-              <b><span id="latitude">0.00</span></b>&deg;
-              latitude by <b><span id="longitude">0.00</span></b>&deg; longitude.
+              <b><span id="latitude">0.000</span></b>&deg;
+              latitude by <b><span id="longitude">0.000</span></b>&deg; longitude.
             </p>
             <p ALIGN = "center">
             <button onclick="getLocation()" class="w3-button w3-center w3-theme">
@@ -108,17 +111,17 @@
     			<table cellpadding="0" cellspacing="0" border="0">
     				<thead>
        					<tr>
-        					<th>STATION 		<br/> # 		</th>
-        					<th>LATITUDE 		<br/> (deg) 	</th>
-        					<th>LONGITUDE		<br/> (deg) 	</th>
-        					<th>WIND DIRECTION 	<br/> (deg true)</th>
-        					<th>WIND SPEED 		<br/> (m/s) 	</th>
-        					<th>WAVE HEIGHT 	<br/> (m)		</th>
-        					<th>AVG PERIOD 		<br/> (sec)		</th>
-        					<th>AIR TEMP 		<br/> (&#8451;) 		</th>
-        					<th>WATER TEMP 		<br/> (&#8451;)		</th>
-        					<th>DISTANCE 		<br/> (miles)	</th>
-                  <th>LAST UPDATED   <br/> (UTC/GMT) </th>
+        					<th>STATION 		    <br/> # 		       </th>
+        					<th>LATITUDE 		    <br/> (deg) 	     </th>
+        					<th>LONGITUDE		    <br/> (deg) 	     </th>
+        					<th>WIND DIRECTION 	<br/> (deg true)   </th>
+        					<th>WIND SPEED 		  <br/> (m/s) 	     </th>
+        					<th>WAVE HEIGHT 	  <br/> (m)		       </th>
+        					<th>AVG PERIOD 		  <br/> (sec)		     </th>
+        					<th>AIR TEMP 		    <br/> (&#8451;) 	 </th>
+        					<th>WATER TEMP 		  <br/> (&#8451;)		 </th>
+        					<th>DISTANCE 		    <br/> (miles)	     </th>
+                  <th>LAST UPDATED    <br/> (UTC/GMT)    </th>
         				</tr>
     				</thead>
 				</table>
@@ -133,6 +136,9 @@
 		</section>
 
     <section>
+      <p align = "center">
+        <button onclick="topFunction()" class="w3-button w3-center w3-theme">Onwards and Upwards</button>
+      </p>
       <h6>Written by Matthew Bailey for MSW</h6>
 
       <!-- Table graphics acknowledgement 

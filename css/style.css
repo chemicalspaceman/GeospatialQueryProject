@@ -9,7 +9,7 @@ h1{
 }
 h6{
   font-size: 30vw;
-  color: rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.1);
   text-transform: uppercase;
   text-align: center;
 }
@@ -47,19 +47,17 @@ td{
 }
 
 
-/* demo styles */
-
-@import url(https://fonts.googleapis.com/css?family=Roboto:400,500,300,700);
+/*@import url(https://fonts.googleapis.com/css?family=Roboto:400,500,300,700); */
 body{
-  background: -webkit-linear-gradient(left, #4286f4, #25b7c4);
-  background: linear-gradient(to right, #e84c92, #4286f4);
+  background: -webkit-linear-gradient(top, #406199, #78c988);
+  background: linear-gradient(to bottom, #7aadff, #67a8db);
   font-family: 'Roboto', sans-serif;
 }
 section{
   margin: 50px;
 }
 
-/* for custom scrollbar for webkit browser*/
+/* Custom scrollbar*/
 
 ::-webkit-scrollbar {
     width: 6px;

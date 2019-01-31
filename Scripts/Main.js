@@ -1,5 +1,4 @@
 //Define a bunch of global variable for dataframe set up
-//var plotDist;
 var noRows;
 var noCols;
 var dataRows;
@@ -61,7 +60,7 @@ function drawMap(){
 
 	//Draw new marker
 	marker = L.marker([latLong[0], latLong[1]]).addTo(mymap);
-	marker.bindPopup("<b>Your chosen location!</b>").openPopup();
+	//marker.bindPopup("<b>Your chosen location!</b>").openPopup();
 
 	//Remove any previous location circle
 	if(circle != undefined){
@@ -113,8 +112,8 @@ function onMapClick(e) {
     let long = latLong[1];
 
     //2 decimal places to display above button
-    latText.innerText = lat.toFixed(2);
-    longText.innerText = long.toFixed(2);
+    latText.innerText = lat.toFixed(3);
+    longText.innerText = long.toFixed(3);
 
 	createDataframe();
  	drawMap();
@@ -131,7 +130,7 @@ fetch('https://cors-anywhere.herokuapp.com/http://www.ndbc.noaa.gov/data/latest_
 
 //Alert user once the latest data has been imported and preprocess import
 function process_response(text){
-	swal("All done!", "The latest NDBC data has been successfully loaded","success",{button:"Let's go",
+	swal("All Done!", "The latest NDBC data has been successfully loaded","success",{button:"Let's Go",
 	});
 
 	//Removes all 'next line' commands from text
@@ -267,8 +266,20 @@ function submitter() {
  	latLong[0] = document.getElementById("lat").value;
  	latLong[1] = document.getElementById("lon").value;
 
+ 		//Write latlng in 'your location' section
+	let lat1 = parseFloat(latLong[0]);
+    let long1 = parseFloat(latLong[1]);
+
+    //2 decimal places to display above button
+    latText.innerText = lat1.toFixed(3);
+    longText.innerText = long1.toFixed(3);
+
+    //Error messages if not in range or NaN
  	if(latLong[0]< -90 || latLong[0] > 90 || latLong[1]< -180 || latLong[1] > 180){
- 		swal("Input not in range","-90 < Latitude < 90 AND -180 < Longitude < 180", "error",{button:"My bad",})
+ 		swal("Input Not In Range","-90 < Latitude < 90 AND -180 < Longitude < 180", "error",{button:"My Bad",})
+ 	}
+ 	else if(isNaN(lat1) || isNaN(long1)){
+ 		swal("Input Must Be A Number","-90 < Latitude < 90 AND -180 < Longitude < 180", "error",{button:"My Bad",})
  	}
  	else{
  		createDataframe();
@@ -339,8 +350,8 @@ function showPosition(position){
     let long = position.coords.longitude;
 
     //2 decimal places to display above button
-    latText.innerText = lat.toFixed(2);
-    longText.innerText = long.toFixed(2);
+    latText.innerText = lat.toFixed(3);
+    longText.innerText = long.toFixed(3);
 
     //Find observations near location
     latLong[0] = lat;
@@ -349,5 +360,12 @@ function showPosition(position){
  	createDataframe();
  	drawMap();
 }
+
+// Scroll to the top of the page
+function topFunction() {
+  document.body.scrollTop = 0; // For Safari
+  document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+}
+
 
 console.log("Weather and wave data visualiser - Matthew Bailey")
